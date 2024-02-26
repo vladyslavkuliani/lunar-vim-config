@@ -11,7 +11,6 @@ lvim.plugins = {
   { 'frenzyexists/aquarium-vim', name = 'aquarium' },
   { "fenetikm/falcon",           name = "falcon" },
   { "sainnhe/sonokai",           name = 'sonokai' },
-  { "oxfist/night-owl.nvim",     name = 'night-owl' },
   { "Everblush/nvim",            name = 'everblush' },
   { 'joshdick/onedark.vim',      name = "onedark" },
   {
@@ -137,8 +136,43 @@ lvim.plugins = {
         vim.api.nvim_win_set_config(win, { zindex = 100 })
       end,
     },
+  },
+  {
+    'stevearc/conform.nvim',
+    opts = {
+      formatters_by_ft = {
+        ["javascript"] = { "prettier" },
+        ["javascriptreact"] = { "prettier" },
+        ["typescript"] = { "prettier" },
+        ["typescriptreact"] = { "prettier" },
+        ["vue"] = { "prettier" },
+        ["css"] = { "prettier" },
+        ["scss"] = { "prettier" },
+        ["less"] = { "prettier" },
+        ["html"] = { "prettier" },
+        ["json"] = { "prettier" },
+        ["jsonc"] = { "prettier" },
+        ["yaml"] = { "prettier" },
+        ["markdown"] = { "prettier" },
+        ["markdown.mdx"] = { "prettier" },
+        ["graphql"] = { "prettier" },
+        ["handlebars"] = { "prettier" },
+      },
+      format_on_save = {
+        -- These options will be passed to conform.format()
+        timeout_ms = 500,
+        lsp_fallback = true,
+      },
+    }
   }
 }
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function(args)
+    require("conform").format({ bufnr = args.buf })
+  end,
+})
 
 
 local keymap = vim.keymap
@@ -193,24 +227,16 @@ linters.setup {
     },
   },
 }
+local lspconfig = require "lspconfig";
+lspconfig.eslint.setup({
+  on_attach = function(client, bufnr)
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      command = "EslintFixAll",
+    })
+  end,
+})
 
-
-local formatters = require "lvim.lsp.null-ls.formatters"
-formatters.setup {
-  {
-    command = "prettier",
-    filetypes = {
-      "javascriptvue",
-      "javascript",
-      "typescriptvue",
-      "typescriptreact",
-      "typescript",
-      "vue",
-      "jsx",
-      "tsx"
-    },
-  },
-}
 lvim.format_on_save.enabled = true
 vim.diagnostic.config({ virtual_text = false })
 
