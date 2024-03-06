@@ -2,7 +2,12 @@
 -- Video Tutorials: https://www.youtube.com/watch?v=sFA9kX-Ud_c&list=PLhoH5vyxr6QqGu0i7tt_XoVK9v-KvZ3m6
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
--- lvim.transparent_window = true
+--
+lvim.transparent_window = true
+
+lvim.keys.normal_mode["<C-s>"] = ":w<Enter>"
+lvim.keys.normal_mode["<C-a>"] = "ggVG"
+
 lvim.plugins = {
   { "lunarvim/colorschemes" },
   { "catppuccin/nvim",           name = "catppuccin", priority = 1000 },
@@ -138,7 +143,7 @@ lvim.plugins = {
     },
   },
   {
-    'stevearc/conform.nvim',
+    "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
         ["javascript"] = { "prettier" },
@@ -158,24 +163,24 @@ lvim.plugins = {
         ["graphql"] = { "prettier" },
         ["handlebars"] = { "prettier" },
       },
-      format_on_save = {
-        -- These options will be passed to conform.format()
-        timeout_ms = 500,
-        lsp_fallback = true,
-      },
-    }
+    },
+  },
+  {
+    "echasnovski/mini.animate",
+    event = "VeryLazy",
   }
 }
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function(args)
-    require("conform").format({ bufnr = args.buf })
-  end,
+require('mini.animate').setup({
+  cursor = {
+    enable = true,
+  },
+  scroll = {
+    -- Whether to enable this animation
+    enable = false,
+  }
 })
 
-
-local keymap = vim.keymap
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("n", "j", "jzz")
@@ -185,23 +190,19 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
-vim.keymap.set("n", "x", '"_x')
-keymap.set("n", "<Leader>p", '"0p')
-keymap.set("n", "<Leader>P", '"0P')
-keymap.set("v", "<Leader>p", '"0p')
-keymap.set("n", "<Leader>c", '"_c')
-keymap.set("n", "<Leader>C", '"_C')
-keymap.set("v", "<Leader>c", '"_c')
-keymap.set("v", "<Leader>C", '"_C')
-keymap.set("n", "<Leader>d", '"_d')
-keymap.set("n", "<Leader>D", '"_D')
-keymap.set("v", "<Leader>D", '"_D')
-keymap.set("v", "<Leader>d", '"_d')
+-- vim.keymap.set("n", "x", '"_x')
+-- keymap.set("n", "<Leader>p", '"0p')
+-- keymap.set("n", "<Leader>P", '"0P')
+-- keymap.set("v", "<Leader>p", '"0p')
+-- keymap.set("n", "<Leader>c", '"_c')
+-- keymap.set("n", "<Leader>C", '"_C')
+-- keymap.set("v", "<Leader>c", '"_c')
+-- keymap.set("v", "<Leader>C", '"_C')
+-- keymap.set("n", "<Leader>d", '"_d')
+-- keymap.set("n", "<Leader>D", '"_D')
+-- keymap.set("v", "<Leader>D", '"_D')
+-- keymap.set("v", "<Leader>d", '"_d')
 
-keymap.set("n", "<C-s>", ":update<cr>")
-
-
-vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 
 
 -- vim.diagnostic.config({ virtual_text = false })
@@ -227,43 +228,43 @@ linters.setup {
     },
   },
 }
-local lspconfig = require "lspconfig";
-lspconfig.eslint.setup({
-  on_attach = function(client, bufnr)
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      command = "EslintFixAll",
-    })
-  end,
-})
+
+local formatters = require "lvim.lsp.null-ls.formatters"
+formatters.setup {
+  {
+    name = "prettier",
+    filetypes = {
+      "javascriptvue",
+      "javascript",
+      "typescriptvue",
+      "typescriptreact",
+      "typescript",
+      "vue",
+      "jsx",
+      "tsx"
+
+    },
+  },
+}
+-- local lspconfig = require "lspconfig";
+-- lspconfig.eslint.setup({
+--   on_attach = function(client, bufnr)
+--     lvim.api.nvim_create_autocmd("BufWritePre", {
+--       buffer = bufnr,
+--       command = "EslintFixAll",
+--     })
+--   end,
+-- })
 
 lvim.format_on_save.enabled = true
 vim.diagnostic.config({ virtual_text = false })
+
+lvim.builtin.lualine.options.theme = "powerline_dark"
 
 
 vim.tbl_map(function(server)
   return server ~= "emmet_ls"
 end, lvim.lsp.automatic_configuration.skipped_servers)
-
--- harpoon setup START
-local harpoon = require("harpoon")
-
--- REQUIRED
-harpoon:setup()
--- REQUIRED
-
-vim.keymap.set("n", "<C-a>", function() harpoon:list():append() end)
-vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-
-vim.keymap.set("n", "<C-f>", function() harpoon:list():select(1) end)
-vim.keymap.set("n", "<C-s>", function() harpoon:list():select(2) end)
-vim.keymap.set("n", "<C-t>", function() harpoon:list():select(3) end)
-vim.keymap.set("n", "<C-4>", function() harpoon:list():select(4) end)
-
--- Toggle previous & next buffers stored within Harpoon list
-vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
-vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
--- harpoon setup END
 
 -- console.log
 vim.keymap.set("n", "<C-/>", function()
