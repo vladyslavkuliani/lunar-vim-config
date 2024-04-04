@@ -5,19 +5,12 @@
 --
 lvim.transparent_window = true
 
-lvim.keys.normal_mode["<C-s>"] = ":w<Enter>"
-lvim.keys.normal_mode["<C-a>"] = "ggVG"
 
 lvim.plugins = {
   { "lunarvim/colorschemes" },
-  { "catppuccin/nvim",           name = "catppuccin", priority = 1000 },
-  { "rebelot/kanagawa.nvim",     name = "kanagawa",   priority = 1000 },
-  { 'rose-pine/neovim',          name = 'rose-pine' },
-  { 'frenzyexists/aquarium-vim', name = 'aquarium' },
-  { "fenetikm/falcon",           name = "falcon" },
-  { "sainnhe/sonokai",           name = 'sonokai' },
-  { "Everblush/nvim",            name = 'everblush' },
-  { 'joshdick/onedark.vim',      name = "onedark" },
+  { "catppuccin/nvim",       name = "catppuccin", priority = 1000 },
+  { "rebelot/kanagawa.nvim", name = "kanagawa",   priority = 1000 },
+  { 'rose-pine/neovim',      name = 'rose-pine' },
   {
     "folke/tokyonight.nvim",
     name = "tokyonight"
@@ -28,7 +21,6 @@ lvim.plugins = {
     priority = 1000,
     opts = {},
   },
-  { "miikanissi/modus-themes.nvim", priority = 1000, name = "modus" },
   { "tpope/vim-surround" },
   {
     "tpope/vim-fugitive",
@@ -62,12 +54,12 @@ lvim.plugins = {
       require("leap").add_default_mappings()
     end,
   },
-  {
-    'VonHeikemen/lsp-zero.nvim',
-    branch = 'v3.x',
-    lazy = true,
-    config = false,
-  },
+  -- {
+  --   'VonHeikemen/lsp-zero.nvim',
+  --   branch = 'v3.x',
+  --   lazy = true,
+  --   config = false,
+  -- },
   {
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -83,7 +75,6 @@ lvim.plugins = {
   },
   {
     "sheerun/vim-polyglot"
-    -- 'maxmellon/vim-jsx-pretty',
   },
   {
     "posva/vim-vue"
@@ -143,33 +134,56 @@ lvim.plugins = {
     },
   },
   {
-    "stevearc/conform.nvim",
-    opts = {
-      formatters_by_ft = {
-        ["javascript"] = { "prettier" },
-        ["javascriptreact"] = { "prettier" },
-        ["typescript"] = { "prettier" },
-        ["typescriptreact"] = { "prettier" },
-        ["vue"] = { "prettier" },
-        ["css"] = { "prettier" },
-        ["scss"] = { "prettier" },
-        ["less"] = { "prettier" },
-        ["html"] = { "prettier" },
-        ["json"] = { "prettier" },
-        ["jsonc"] = { "prettier" },
-        ["yaml"] = { "prettier" },
-        ["markdown"] = { "prettier" },
-        ["markdown.mdx"] = { "prettier" },
-        ["graphql"] = { "prettier" },
-        ["handlebars"] = { "prettier" },
-      },
-    },
+    "nvimtools/none-ls.nvim",
+    config = function()
+      lvim.format_on_save.enabled = true
+
+      local null_ls = require("null-ls")
+
+      null_ls.setup({
+        sources = {
+          null_ls.builtins.formatting.prettier,
+          null_ls.builtins.diagnostics.eslint_d,
+        },
+      })
+    end
   },
   {
     "echasnovski/mini.animate",
     event = "VeryLazy",
+  },
+  {
+    "chentoast/marks.nvim"
+  },
+
+}
+
+-- require('telescope').setup({
+--   defaults = {
+--     layout_strategy = "horizontal",
+--     layout_config = {
+--       height = 0.95
+--     }
+--   },
+--   pickers = {
+--     layout_config = {
+--       horizontal = { width = 0.5 },
+--       mirror = true,
+--       prompt_position = 'bottom'
+--     },
+--     -- find_files = {
+--     --   theme = "dropdown",
+--     -- },
+--   },
+-- })
+lvim.builtin.telescope = {
+  active = true,
+  defaults = {
+    layout_strategy = "horizontal",
+    path_display = { truncate = 2 }
   }
 }
+
 
 require('mini.animate').setup({
   cursor = {
@@ -190,20 +204,9 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
--- vim.keymap.set("n", "x", '"_x')
--- keymap.set("n", "<Leader>p", '"0p')
--- keymap.set("n", "<Leader>P", '"0P')
--- keymap.set("v", "<Leader>p", '"0p')
--- keymap.set("n", "<Leader>c", '"_c')
--- keymap.set("n", "<Leader>C", '"_C')
--- keymap.set("v", "<Leader>c", '"_c')
--- keymap.set("v", "<Leader>C", '"_C')
--- keymap.set("n", "<Leader>d", '"_d')
--- keymap.set("n", "<Leader>D", '"_D')
--- keymap.set("v", "<Leader>D", '"_D')
--- keymap.set("v", "<Leader>d", '"_d')
-
-
+lvim.keys.normal_mode["<C-s>"] = ":w<Enter>"
+lvim.keys.normal_mode["<C-a>"] = "ggVG"
+lvim.keys.normal_mode["<C-y>"] = "bye"
 
 -- vim.diagnostic.config({ virtual_text = false })
 vim.keymap.set("n", "<C-i>", function() require("trouble").toggle() end)
@@ -212,55 +215,7 @@ lvim.colorscheme = "solarized-osaka"
 
 vim.opt.relativenumber = true
 
-local linters = require "lvim.lsp.null-ls.linters"
-linters.setup {
-  {
-    command = "eslint",
-    filetypes = {
-      "javascriptvue",
-      "javascript",
-      "typescriptvue",
-      "typescriptreact",
-      "typescript",
-      "vue",
-      "jsx",
-      "tsx"
-    },
-  },
-}
-
-local formatters = require "lvim.lsp.null-ls.formatters"
-formatters.setup {
-  {
-    name = "prettier",
-    filetypes = {
-      "javascriptvue",
-      "javascript",
-      "typescriptvue",
-      "typescriptreact",
-      "typescript",
-      "vue",
-      "jsx",
-      "tsx"
-
-    },
-  },
-}
--- local lspconfig = require "lspconfig";
--- lspconfig.eslint.setup({
---   on_attach = function(client, bufnr)
---     lvim.api.nvim_create_autocmd("BufWritePre", {
---       buffer = bufnr,
---       command = "EslintFixAll",
---     })
---   end,
--- })
-
-lvim.format_on_save.enabled = true
-vim.diagnostic.config({ virtual_text = false })
-
 lvim.builtin.lualine.options.theme = "powerline_dark"
-
 
 vim.tbl_map(function(server)
   return server ~= "emmet_ls"
@@ -280,3 +235,5 @@ vim.keymap.set("n", "<C-/>", function()
     vim.api.nvim_feedkeys(key, 'n', false)
   end)
 end)
+
+-- lvim.capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = true
