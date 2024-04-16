@@ -204,6 +204,10 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
+-- Navigate between quickfix items
+vim.keymap.set("n", "<leader>h", "<cmd>cnext<CR>zz", { desc = "Forward qfixlist" })
+vim.keymap.set("n", "<leader>;", "<cmd>cprev<CR>zz", { desc = "Backward qfixlist" })
+
 lvim.keys.normal_mode["<C-s>"] = ":w<Enter>"
 lvim.keys.normal_mode["<C-a>"] = "ggVG"
 lvim.keys.normal_mode["<C-y>"] = "bye"
